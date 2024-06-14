@@ -1,16 +1,19 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
-import 'package:mysql1/mysql1.dart';
+import 'package:mysql_client/mysql_client.dart';
 import 'package:shelf_cors_headers/shelf_cors_headers.dart' as shelf;
 
 Handler middleware(Handler handler) {
   final env = DotEnv(includePlatformEnvironment: true)..load();
-  final settings = ConnectionSettings(
+
+  final pool = MySQLConnectionPool(
     host: env['DB_HOST'] ?? 'localhost',
     port: int.parse(env['DB_PORT'] ?? '3306'),
-    user: env['DB_USER'] ?? 'root',
-    password: env['DB_PASSWORD'] ?? '14172003',
-    db: env['DB_NAME'] ?? 'mercado',
+    userName: env['DB_USER'] ?? 'root',
+    password: env['DB_PASSWORD'] ?? '',
+    maxConnections: 10,
+    databaseName: env['DB_NAME'],
+    secure: true,
   );
 
   return handler
@@ -25,8 +28,8 @@ Handler middleware(Handler handler) {
         ),
       )
       .use(
-        provider<Future<MySqlConnection>>(
-          (context) async => MySqlConnection.connect(settings),
+        provider<MySQLConnectionPool>(
+          (context) => pool,
         ),
       );
 }

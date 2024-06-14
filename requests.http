@@ -5,3 +5,14 @@ GET http://localhost:8080/api/v1/hello_world
 GET http://localhost:8080
 
 ###
+
+POST http://localhost:8080
+content-type: application/json
+
+{
+  "id": 2, 
+  "citizen_id": 987654321, 
+  "name": "Jane Doe", 
+  "phone_number": 9876543210, 
+  "password": 1234
+}

@@ -1,17 +1,30 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dart_frog/dart_frog.dart';
-import 'package:mysql1/mysql1.dart';
+import 'package:mysql_client/mysql_client.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final connection = await context.read<Future<MySqlConnection>>();
-  final result = await connection.query('SELECT * FROM user');
-  print(result);
+  return switch (context.request.method) {
+    HttpMethod.get => await onGet(context),
+    HttpMethod.post => await onPost(context),
+    _ => Response(statusCode: HttpStatus.badRequest),
+  };
+}
 
-  /* for (final row in result) {
+Future<Response> onGet(RequestContext context) async {
+  final connection = context.read<MySQLConnectionPool>();
+  final result = await connection.execute('SELECT * FROM user');
+  final rows = result.rows.map((row) => row.assoc()).toList();
+  for (final row in rows) {
     print(row);
-    row.fields.forEach(
-      (key, value) => print('${key}: ${value}'),
-    );
-  } */
+  }
   await connection.close();
-  return Response(body: 'Welcome to Dart Frog!');
+  return Response(statusCode: HttpStatus.ok, body: rows.toString());
+}
+
+Future<Response> onPost(RequestContext context) async {
+  final json = jsonDecode(await context.request.body());
+  print(json);
+  return Response(statusCode: HttpStatus.created, body: 'POSTING');
 }
