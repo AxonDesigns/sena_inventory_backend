@@ -33,9 +33,3 @@ Future<Response> _onPost(RequestContext context) async {
   }
   return Response(statusCode: HttpStatus.created, body: createdUser.toJson());
 }
-
-Future<Response> _onDelete(RequestContext context, String id) async {
-  final userRepository = context.read<UserRepository>();
-  await userRepository.deleteUser(int.parse(id));
-  return Response(statusCode: HttpStatus.noContent);
-}

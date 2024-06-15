@@ -114,6 +114,7 @@ class User extends Entity {
   final String password;
 
   /// Convert to a map
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id.toInt(),
@@ -127,6 +128,7 @@ class User extends Entity {
   }
 
   /// Convert to a json string
+  @override
   String toJson() => jsonEncode(toMap());
 
   //TODO: Might be useless
