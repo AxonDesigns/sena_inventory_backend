@@ -15,3 +15,21 @@ content-type: application/json
   "phone_number": 3133391218,  
   "password": "acciol4003131"
 }
+###
+
+GET http://localhost:3000/api/v1/users
+
+###
+
+DELETE http://localhost:3000/api/v1/users/12
+
+###
+
+PUT http://localhost:3000/api/v1/users/13
+content-type: application/json
+
+{
+  "name": "Kevin Sneyder Hernandez Camacho"
+}
+
+###

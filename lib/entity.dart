@@ -2,17 +2,17 @@
 class Entity {
   /// Create a new entity
   const Entity({
-    this.id,
-    this.createdAt,
-    this.updatedAt,
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   /// Entity id
-  final BigInt? id;
+  final BigInt id;
 
   /// Entity created at
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
   /// Entity updated at
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
 }

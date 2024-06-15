@@ -8,16 +8,15 @@ class UserRepository extends Repository<User> {
   const UserRepository(super.pool);
 
   /// Create a new user
-  Future<void> createUser(User user) async {
+  Future<void> createUser(UserDTO userRequest) async {
     await pool.execute(
       'INSERT INTO user (citizen_id, name, phone_number, password) '
       'VALUES (:citizen_id, :name, :phone_number, :password)',
       {
-        'id': user.id,
-        'citizen_id': user.citizenId,
-        'name': user.name,
-        'phone_number': user.phoneNumber,
-        'password': user.password,
+        'citizen_id': userRequest.citizenId,
+        'name': userRequest.name,
+        'phone_number': userRequest.phoneNumber,
+        'password': userRequest.password,
       },
     );
   }
@@ -31,11 +30,41 @@ class UserRepository extends Repository<User> {
   }
 
   /// Get a user by id
-  Future<User> getUser(int id) async {
+  Future<User?> getUser(int id) async {
     final result = await pool.execute('SELECT id, citizen_id, name, phone_number, password, created_at, updated_at FROM user WHERE id = :id', {
       'id': id,
     });
+    if (result.rows.isEmpty) return null;
+
     return User.fromMap(result.rows.first.assoc());
+  }
+
+  /// Delete a user by id
+  Future<void> deleteUser(int id) async {
+    await pool.execute('DELETE FROM user WHERE id = :id', {
+      'id': id,
+    });
+  }
+
+  /// Update a user by id
+  Future<bool> updateUser(UserDTO userRequest, int id) async {
+    final savedUser = await getUser(id);
+    if (savedUser == null) {
+      return false;
+    }
+    await pool.execute(
+      'UPDATE user SET citizen_id = :citizen_id, name = :name, '
+      'phone_number = :phone_number, password = :password WHERE id = :id',
+      {
+        'id': savedUser.id,
+        'citizen_id': userRequest.citizenId ?? savedUser.citizenId,
+        'name': userRequest.name ?? savedUser.name,
+        'phone_number': userRequest.phoneNumber ?? savedUser.phoneNumber,
+        'password': userRequest.password ?? savedUser.password,
+      },
+    );
+
+    return true;
   }
 }
 
@@ -54,18 +83,21 @@ class User extends Entity {
 
   /// Create a new user entity from a map
   factory User.fromMap(Map<String, dynamic> map) {
+    final id = BigInt.tryParse(map['id'] == null ? '' : map['id'] as String);
+    final createdAt = DateTime.tryParse(
+      map['created_at'] == null ? '' : map['created_at'] as String,
+    );
+    final updatedAt = DateTime.tryParse(
+      map['updated_at'] == null ? '' : map['updated_at'] as String,
+    );
     return User(
-      id: BigInt.tryParse(map['id'] == null ? '' : map['id'] as String),
+      id: id ?? BigInt.zero,
       citizenId: map['citizen_id'].toString(),
       name: map['name'] as String,
       phoneNumber: map['phone_number'].toString(),
       password: map['phone_number'].toString(),
-      createdAt: DateTime.tryParse(
-        map['created_at'] == null ? '' : map['created_at'] as String,
-      ),
-      updatedAt: DateTime.tryParse(
-        map['updated_at'] == null ? '' : map['updated_at'] as String,
-      ),
+      createdAt: createdAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? DateTime.now(),
     );
   }
 
@@ -84,23 +116,99 @@ class User extends Entity {
   /// Convert to a map
   Map<String, dynamic> toMap() {
     return {
-      'id': id?.toInt(),
+      'id': id.toInt(),
       'citizen_id': citizenId,
       'name': name,
       'phone_number': phoneNumber,
       'password': password,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 
   /// Convert to a json string
   String toJson() => jsonEncode(toMap());
 
+  //TODO: Might be useless
+  /// Convert to a user request
+  UserDTO toUserDTO() {
+    return UserDTO(
+      citizenId: citizenId,
+      name: name,
+      phoneNumber: phoneNumber,
+      password: password,
+    );
+  }
+
   @override
   String toString() {
     return 'User(id: $id, citizenId: $citizenId, '
         'name: $name, phoneNumber: $phoneNumber, '
         'password: $password, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+}
+
+/// User Request
+
+class UserDTO {
+  /// Create a new user request
+  const UserDTO({
+    this.citizenId,
+    this.name,
+    this.phoneNumber,
+    this.password,
+  });
+
+  /// Convert to a map from a json string
+  factory UserDTO.fromMap(Map<String, dynamic> map) {
+    return UserDTO(
+      citizenId: map['citizen_id']?.toString(),
+      name: map['name']?.toString(),
+      phoneNumber: map['phone_number']?.toString(),
+      password: map['password']?.toString(),
+    );
+  }
+
+  /// Convert to a user request from a json string
+  factory UserDTO.fromJson(String json) {
+    return UserDTO.fromMap(
+      jsonDecode(json) as Map<String, dynamic>,
+    );
+  }
+
+  final String? citizenId;
+  final String? name;
+  final String? phoneNumber;
+  final String? password;
+
+  /// Convert to a map
+  Map<String, dynamic> toMap() {
+    return {
+      'citizen_id': citizenId,
+      'name': name,
+      'phone_number': phoneNumber,
+      'password': password,
+    };
+  }
+
+  /// Convert to a json string
+  String toJson() => jsonEncode(toMap());
+
+  /// Convert to a user
+  User toUser() {
+    return User(
+      id: BigInt.zero,
+      citizenId: citizenId ?? '',
+      name: name ?? '',
+      phoneNumber: phoneNumber ?? '',
+      password: password ?? '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'UserRequest(citizenId: $citizenId, name: $name, phoneNumber: $phoneNumber, password: $password)';
   }
 }
