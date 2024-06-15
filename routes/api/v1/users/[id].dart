@@ -14,7 +14,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
 Future<Response> _onGet(RequestContext context, String id) async {
   final userRepository = context.read<UserRepository>();
-  final user = await userRepository.getUser(int.parse(id));
+  final user = await userRepository.getUser(BigInt.parse(id));
   if (user == null) {
     return Response(statusCode: HttpStatus.notFound);
   }
@@ -23,13 +23,13 @@ Future<Response> _onGet(RequestContext context, String id) async {
 
 Future<Response> _onDelete(RequestContext context, String id) async {
   final userRepository = context.read<UserRepository>();
-  await userRepository.deleteUser(int.parse(id));
+  await userRepository.deleteUser(BigInt.parse(id));
   return Response();
 }
 
 Future<Response> _onPut(RequestContext context, String id) async {
   final userRepository = context.read<UserRepository>();
   final userRequest = UserDTO.fromJson(await context.request.body());
-  await userRepository.updateUser(userRequest, int.parse(id));
+  await userRepository.updateUser(userRequest, BigInt.parse(id));
   return Response();
 }

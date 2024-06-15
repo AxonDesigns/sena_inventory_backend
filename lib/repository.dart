@@ -10,8 +10,8 @@ class Repository<T extends Entity> {
   final MySQLConnectionPool pool;
 
   /// Get last inserted id
-  Future<int?> getLastInsertId() async {
+  Future<BigInt?> getLastInsertId() async {
     final result = await pool.execute('SELECT LAST_INSERT_ID()');
-    return int.tryParse(result.rows.first.assoc()['LAST_INSERT_ID()'] ?? '');
+    return BigInt.tryParse(result.rows.first.assoc()['LAST_INSERT_ID()'] ?? '');
   }
 }

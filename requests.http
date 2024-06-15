@@ -14,7 +14,7 @@ content-type: application/json
 }
 ###
 
-GET http://localhost:3000/api/v1/users
+GET http://localhost:3000/api/v1/users?limit=10&offset=0&expand=role_id
 
 ###
 

@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:sena_inventory_backend/repositories/role_repository.dart';
 import 'package:sena_inventory_backend/user_repository.dart';
+import 'package:sena_inventory_backend/utils.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
@@ -12,10 +15,28 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onGet(RequestContext context) async {
+  final query = _parseQuery(context.request.uri.queryParameters);
   final userRepository = context.read<UserRepository>();
   final users = await userRepository.getUsers();
-  final result = users.map((user) => user.toJson()).toList();
-  return Response(body: result.toString());
+
+  final result = await Future.wait(
+    users.map((user) async {
+      final userMap = user.toMap();
+
+      if (query.expand.contains('role_id')) {
+        final roleRepository = context.read<RoleRepository>();
+        final role = await roleRepository.getRole(user.roleId);
+        if (role != null) {
+          userMap['role'] = role.toMap();
+          userMap.remove('role_id');
+        }
+      }
+
+      return userMap;
+    }),
+  );
+
+  return Response(body: jsonEncode(result));
 }
 
 Future<Response> _onPost(RequestContext context) async {
@@ -32,4 +53,12 @@ Future<Response> _onPost(RequestContext context) async {
     return Response(statusCode: HttpStatus.internalServerError);
   }
   return Response(statusCode: HttpStatus.created, body: createdUser.toJson());
+}
+
+({int limit, int offset, List<String> expand}) _parseQuery(Map<String, dynamic> query) {
+  final limit = int.tryParse(parseString(query['limit'])) ?? 10;
+  final offset = int.tryParse(parseString(query['offset'])) ?? 0;
+  final expandList = parseString(query['expand']).split(',').toList();
+
+  return (limit: limit, offset: offset, expand: expandList);
 }

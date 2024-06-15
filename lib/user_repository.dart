@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'package:sena_inventory_backend/entity.dart';
 import 'package:sena_inventory_backend/repositories/role_repository.dart';
 import 'package:sena_inventory_backend/repository.dart';
+import 'package:sena_inventory_backend/utils.dart';
 
 /// User repository
 class UserRepository extends Repository<User> {
   /// Create a new user repository
-  const UserRepository(super.pool);
+  UserRepository(super.pool) : roleRepository = RoleRepository(pool);
+
+  final RoleRepository roleRepository;
 
   /// Create a new user
   Future<void> createUser(UserDTO userRequest) async {
@@ -19,6 +22,7 @@ class UserRepository extends Repository<User> {
         'email': userRequest.email,
         'phone_number': userRequest.phoneNumber,
         'password': userRequest.password,
+        'role_id': userRequest.roleId.toString(),
       },
     );
   }
@@ -26,14 +30,14 @@ class UserRepository extends Repository<User> {
   /// Get all users
   Future<List<User>> getUsers() async {
     final result = await pool.execute('SELECT id, citizen_id, name, '
-        'email, phone_number, password, created_at, updated_at FROM users');
+        'email, phone_number, password, role_id, created_at, updated_at FROM users');
     return result.rows.map((row) {
       return User.fromMap(row.assoc());
     }).toList();
   }
 
   /// Get a user by id
-  Future<User?> getUser(int id) async {
+  Future<User?> getUser(BigInt id) async {
     final result = await pool.execute(
         'SELECT id, citizen_id, name, '
         'email, phone_number, password, created_at, '
@@ -47,14 +51,14 @@ class UserRepository extends Repository<User> {
   }
 
   /// Delete a user by id
-  Future<void> deleteUser(int id) async {
+  Future<void> deleteUser(BigInt id) async {
     await pool.execute('DELETE FROM users WHERE id = :id', {
       'id': id,
     });
   }
 
   /// Update a user by id
-  Future<bool> updateUser(UserDTO userRequest, int id) async {
+  Future<bool> updateUser(UserDTO userRequest, BigInt id) async {
     final savedUser = await getUser(id);
     if (savedUser == null) {
       return false;
@@ -88,28 +92,21 @@ class User extends Entity {
     required this.email,
     required this.phoneNumber,
     required this.password,
-    required this.role,
+    required this.roleId,
   });
 
   /// Create a new user entity from a map
   factory User.fromMap(Map<String, dynamic> map) {
-    final id = BigInt.tryParse(map['id'] == null ? '' : map['id'] as String);
-    final createdAt = DateTime.tryParse(
-      map['created_at'] == null ? '' : map['created_at'] as String,
-    );
-    final updatedAt = DateTime.tryParse(
-      map['updated_at'] == null ? '' : map['updated_at'] as String,
-    );
     return User(
-      id: id ?? BigInt.zero,
+      id: BigInt.tryParse(parseString(map['id'])) ?? BigInt.zero,
       citizenId: map['citizen_id'].toString(),
       name: map['name'] as String,
       email: map['email'] as String,
       phoneNumber: map['phone_number'].toString(),
       password: map['phone_number'].toString(),
-      role: Role.fromMap(map['role'] as Map<String, dynamic>),
-      createdAt: createdAt ?? DateTime.now(),
-      updatedAt: updatedAt ?? DateTime.now(),
+      roleId: BigInt.tryParse(parseString(map['role_id'])) ?? BigInt.zero,
+      createdAt: DateTime.tryParse(parseString(map['created_at'])) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(parseString(map['updated_at'])) ?? DateTime.now(),
     );
   }
 
@@ -125,13 +122,13 @@ class User extends Entity {
   final String email;
   final String phoneNumber;
   final String password;
-  final Role role;
+  final BigInt roleId;
 
   /// Convert to a map
   @override
   Map<String, dynamic> toMap() {
     return {
-      'id': id.toInt(),
+      'id': id.toString(),
       'citizen_id': citizenId,
       'name': name,
       'phone_number': phoneNumber,
@@ -173,7 +170,7 @@ class UserDTO {
     this.email,
     this.phoneNumber,
     this.password,
-    this.role,
+    this.roleId,
   });
 
   /// Convert to a map from a json string
@@ -184,6 +181,7 @@ class UserDTO {
       email: map['email']?.toString(),
       phoneNumber: map['phone_number']?.toString(),
       password: map['password']?.toString(),
+      roleId: BigInt.tryParse(parseString(map['role_id'])),
     );
   }
 
@@ -199,7 +197,7 @@ class UserDTO {
   final String? email;
   final String? phoneNumber;
   final String? password;
-  final RoleDTO? role;
+  final BigInt? roleId;
 
   /// Convert to a map
   Map<String, dynamic> toMap() {
@@ -226,7 +224,7 @@ class UserDTO {
       password: password ?? '',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      role: role?.toRole() ?? const RoleDTO(name: '').toRole(),
+      roleId: roleId ?? BigInt.zero,
     );
   }
 

@@ -28,34 +28,34 @@ class RoleRepository extends Repository<Role> {
   }
 
   /// Get a role by id
-  Future<Role?> getRole(int id) async {
-    final result = await pool.execute('SELECT id, name, created_at, updated_at FROM roles WHERE id = :id', {
-      'id': id,
-    });
+  Future<Role?> getRole(BigInt id) async {
+    final result = await pool.execute(
+      'SELECT id, name, created_at, updated_at '
+      'FROM roles WHERE id = :id',
+      {'id': id},
+    );
     if (result.rows.isEmpty) return null;
 
     return Role.fromMap(result.rows.first.assoc());
   }
 
   /// Delete a role by id
-  Future<void> deleteRole(int id) async {
-    await pool.execute('DELETE FROM roles WHERE id = :id', {
-      'id': id,
-    });
+  Future<void> deleteRole(BigInt id) async {
+    await pool.execute(
+      'DELETE FROM roles WHERE id = :id',
+      {'id': id},
+    );
   }
 
   /// Update a role by id
-  Future<bool> updateRole(RoleDTO roleRequest, int id) async {
+  Future<bool> updateRole(RoleDTO roleRequest, BigInt id) async {
     final savedRole = await getRole(id);
     if (savedRole == null) {
       return false;
     }
     await pool.execute(
       'UPDATE roles SET name = :name WHERE id = :id',
-      {
-        'id': savedRole.id,
-        'name': roleRequest.name,
-      },
+      {'id': savedRole.id, 'name': roleRequest.name},
     );
 
     return true;
@@ -99,7 +99,7 @@ class Role extends Entity {
   @override
   Map<String, dynamic> toMap() {
     return {
-      'id': id.toInt(),
+      'id': id.toString(),
       'name': name,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
