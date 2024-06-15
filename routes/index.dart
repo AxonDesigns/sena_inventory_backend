@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:mysql_client/mysql_client.dart';
+import 'package:sena_inventory_backend/user_repository.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
@@ -13,18 +12,22 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> onGet(RequestContext context) async {
-  final connection = context.read<MySQLConnectionPool>();
-  final result = await connection.execute('SELECT * FROM user');
-  final rows = result.rows.map((row) => row.assoc()).toList();
-  for (final row in rows) {
-    print(row);
-  }
-  await connection.close();
-  return Response(statusCode: HttpStatus.ok, body: rows.toString());
+  final userRepository = context.read<UserRepository>();
+  final users = await userRepository.getUsers();
+
+  final result = users.map((user) => user.toJson()).toList();
+  return Response(body: result.toString());
 }
 
 Future<Response> onPost(RequestContext context) async {
-  final json = jsonDecode(await context.request.body());
-  print(json);
-  return Response(statusCode: HttpStatus.created, body: 'POSTING');
+  final user = User.fromJson(await context.request.body());
+  final userRepository = context.read<UserRepository>();
+  await userRepository.createUser(user);
+
+  final createdId = await userRepository.getLastInsertId();
+  if (createdId == null) {
+    return Response(statusCode: HttpStatus.internalServerError);
+  }
+  final createdUser = await userRepository.getUser(createdId);
+  return Response(statusCode: HttpStatus.created, body: createdUser.toJson());
 }
