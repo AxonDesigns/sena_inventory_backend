@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:sena_inventory_backend/entity.dart';
+import 'package:sena_inventory_backend/repositories/role_repository.dart';
 import 'package:sena_inventory_backend/repository.dart';
 
 /// User repository
@@ -10,11 +11,12 @@ class UserRepository extends Repository<User> {
   /// Create a new user
   Future<void> createUser(UserDTO userRequest) async {
     await pool.execute(
-      'INSERT INTO user (citizen_id, name, phone_number, password) '
+      'INSERT INTO users (citizen_id, name, email, phone_number, password) '
       'VALUES (:citizen_id, :name, :phone_number, :password)',
       {
         'citizen_id': userRequest.citizenId,
         'name': userRequest.name,
+        'email': userRequest.email,
         'phone_number': userRequest.phoneNumber,
         'password': userRequest.password,
       },
@@ -23,7 +25,8 @@ class UserRepository extends Repository<User> {
 
   /// Get all users
   Future<List<User>> getUsers() async {
-    final result = await pool.execute('SELECT id, citizen_id, name, phone_number, password, created_at, updated_at FROM user');
+    final result = await pool.execute('SELECT id, citizen_id, name, '
+        'email, phone_number, password, created_at, updated_at FROM users');
     return result.rows.map((row) {
       return User.fromMap(row.assoc());
     }).toList();
@@ -31,9 +34,13 @@ class UserRepository extends Repository<User> {
 
   /// Get a user by id
   Future<User?> getUser(int id) async {
-    final result = await pool.execute('SELECT id, citizen_id, name, phone_number, password, created_at, updated_at FROM user WHERE id = :id', {
-      'id': id,
-    });
+    final result = await pool.execute(
+        'SELECT id, citizen_id, name, '
+        'email, phone_number, password, created_at, '
+        'updated_at FROM users WHERE id = :id',
+        {
+          'id': id,
+        });
     if (result.rows.isEmpty) return null;
 
     return User.fromMap(result.rows.first.assoc());
@@ -41,7 +48,7 @@ class UserRepository extends Repository<User> {
 
   /// Delete a user by id
   Future<void> deleteUser(int id) async {
-    await pool.execute('DELETE FROM user WHERE id = :id', {
+    await pool.execute('DELETE FROM users WHERE id = :id', {
       'id': id,
     });
   }
@@ -53,12 +60,13 @@ class UserRepository extends Repository<User> {
       return false;
     }
     await pool.execute(
-      'UPDATE user SET citizen_id = :citizen_id, name = :name, '
+      'UPDATE users SET citizen_id = :citizen_id, name = :name, email = :email, '
       'phone_number = :phone_number, password = :password WHERE id = :id',
       {
         'id': savedUser.id,
         'citizen_id': userRequest.citizenId ?? savedUser.citizenId,
         'name': userRequest.name ?? savedUser.name,
+        'email': userRequest.email ?? savedUser.email,
         'phone_number': userRequest.phoneNumber ?? savedUser.phoneNumber,
         'password': userRequest.password ?? savedUser.password,
       },
@@ -77,8 +85,10 @@ class User extends Entity {
     required super.updatedAt,
     required this.citizenId,
     required this.name,
+    required this.email,
     required this.phoneNumber,
     required this.password,
+    required this.role,
   });
 
   /// Create a new user entity from a map
@@ -94,8 +104,10 @@ class User extends Entity {
       id: id ?? BigInt.zero,
       citizenId: map['citizen_id'].toString(),
       name: map['name'] as String,
+      email: map['email'] as String,
       phoneNumber: map['phone_number'].toString(),
       password: map['phone_number'].toString(),
+      role: Role.fromMap(map['role'] as Map<String, dynamic>),
       createdAt: createdAt ?? DateTime.now(),
       updatedAt: updatedAt ?? DateTime.now(),
     );
@@ -110,8 +122,10 @@ class User extends Entity {
 
   final String citizenId;
   final String name;
+  final String email;
   final String phoneNumber;
   final String password;
+  final Role role;
 
   /// Convert to a map
   @override
@@ -145,20 +159,21 @@ class User extends Entity {
   @override
   String toString() {
     return 'User(id: $id, citizenId: $citizenId, '
-        'name: $name, phoneNumber: $phoneNumber, '
+        'name: $name, email: $email, phoneNumber: $phoneNumber, '
         'password: $password, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
 /// User Request
-
 class UserDTO {
   /// Create a new user request
   const UserDTO({
     this.citizenId,
     this.name,
+    this.email,
     this.phoneNumber,
     this.password,
+    this.role,
   });
 
   /// Convert to a map from a json string
@@ -166,6 +181,7 @@ class UserDTO {
     return UserDTO(
       citizenId: map['citizen_id']?.toString(),
       name: map['name']?.toString(),
+      email: map['email']?.toString(),
       phoneNumber: map['phone_number']?.toString(),
       password: map['password']?.toString(),
     );
@@ -180,14 +196,17 @@ class UserDTO {
 
   final String? citizenId;
   final String? name;
+  final String? email;
   final String? phoneNumber;
   final String? password;
+  final RoleDTO? role;
 
   /// Convert to a map
   Map<String, dynamic> toMap() {
     return {
       'citizen_id': citizenId,
       'name': name,
+      'email': email,
       'phone_number': phoneNumber,
       'password': password,
     };
@@ -202,15 +221,18 @@ class UserDTO {
       id: BigInt.zero,
       citizenId: citizenId ?? '',
       name: name ?? '',
+      email: email ?? '',
       phoneNumber: phoneNumber ?? '',
       password: password ?? '',
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      role: role?.toRole() ?? const RoleDTO(name: '').toRole(),
     );
   }
 
   @override
   String toString() {
-    return 'UserRequest(citizenId: $citizenId, name: $name, phoneNumber: $phoneNumber, password: $password)';
+    return 'UserRequest(citizenId: $citizenId, name: $name, '
+        'email: $email, phoneNumber: $phoneNumber, password: $password)';
   }
 }

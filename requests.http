@@ -1,23 +1,24 @@
-GET http://localhost:3000/api/v1/hello_world
-
-###
-
 GET http://localhost:3000
 
 ###
 
-POST http://localhost:3000
+POST http://localhost:3000/api/v1/users
 content-type: application/json
 
 {
-  "citizen_id": 1005037761, 
-  "name": "Brayan Stiven Hernandez", 
-  "phone_number": 3133391218,  
+  "citizen_id": "1005037761", 
+  "name": "Brayan Stiven Hernandez",
+  "email": "acciol400@gmail.com",
+  "phone_number": "3133391218",
   "password": "acciol4003131"
 }
 ###
 
 GET http://localhost:3000/api/v1/users
+
+###
+
+GET http://localhost:3000/api/v1/users/1
 
 ###
 

@@ -5,9 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "sena_inventory_backend",
+      "name": "run server",
       "request": "launch",
       "type": "dart",
+      "program": "bin/main.dart",
+      "args": [
+        "--port 3000"
+      ]
     }
   ]
 }
