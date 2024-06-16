@@ -22,7 +22,6 @@ Future<Response> _onGet(RequestContext context) async {
   final result = await Future.wait(
     users.map((user) async {
       final userMap = user.toMap();
-
       if (query.expand.contains('role_id')) {
         final roleRepository = context.read<RoleRepository>();
         final role = await roleRepository.getRole(user.roleId);
@@ -45,12 +44,14 @@ Future<Response> _onPost(RequestContext context) async {
   await userRepository.createUser(user);
 
   final createdId = await userRepository.getLastInsertId();
+  print(createdId);
   if (createdId == null) {
-    return Response(statusCode: HttpStatus.internalServerError);
+    return Response(statusCode: HttpStatus.internalServerError, body: 'Error creating user');
   }
   final createdUser = await userRepository.getUser(createdId);
+  print(createdUser);
   if (createdUser == null) {
-    return Response(statusCode: HttpStatus.internalServerError);
+    return Response(statusCode: HttpStatus.internalServerError, body: 'User not found');
   }
   return Response(statusCode: HttpStatus.created, body: createdUser.toJson());
 }

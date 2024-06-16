@@ -14,8 +14,8 @@ class UserRepository extends Repository<User> {
   /// Create a new user
   Future<void> createUser(UserDTO userRequest) async {
     await pool.execute(
-      'INSERT INTO users (citizen_id, name, email, phone_number, password) '
-      'VALUES (:citizen_id, :name, :phone_number, :password)',
+      'INSERT INTO users (citizen_id, name, email, phone_number, password, role_id) '
+      'VALUES (:citizen_id, :name, :email, :phone_number, :password, :role_id)',
       {
         'citizen_id': userRequest.citizenId,
         'name': userRequest.name,
@@ -40,7 +40,7 @@ class UserRepository extends Repository<User> {
   Future<User?> getUser(BigInt id) async {
     final result = await pool.execute(
         'SELECT id, citizen_id, name, '
-        'email, phone_number, password, created_at, '
+        'email, phone_number, password, role_id, created_at, '
         'updated_at FROM users WHERE id = :id',
         {
           'id': id,
@@ -65,7 +65,7 @@ class UserRepository extends Repository<User> {
     }
     await pool.execute(
       'UPDATE users SET citizen_id = :citizen_id, name = :name, email = :email, '
-      'phone_number = :phone_number, password = :password WHERE id = :id',
+      'phone_number = :phone_number, password = :password, role_id = :role_id WHERE id = :id',
       {
         'id': savedUser.id,
         'citizen_id': userRequest.citizenId ?? savedUser.citizenId,
@@ -73,6 +73,7 @@ class UserRepository extends Repository<User> {
         'email': userRequest.email ?? savedUser.email,
         'phone_number': userRequest.phoneNumber ?? savedUser.phoneNumber,
         'password': userRequest.password ?? savedUser.password,
+        'role_id': userRequest.roleId ?? savedUser.roleId,
       },
     );
 
@@ -133,6 +134,7 @@ class User extends Entity {
       'name': name,
       'phone_number': phoneNumber,
       'password': password,
+      'role_id': roleId.toString(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };

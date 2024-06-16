@@ -6,15 +6,25 @@ POST http://localhost:3000/api/v1/users
 content-type: application/json
 
 {
-  "citizen_id": "1005037761", 
-  "name": "Brayan Stiven Hernandez",
-  "email": "acciol400@gmail.com",
-  "phone_number": "3133391218",
-  "password": "acciol4003131"
+  "citizen_id": "1005037454", 
+  "name": "Kevin Sneyder Hernandez Camacho",
+  "email": "45645@gmail.com",
+  "phone_number": "3133321318",
+  "password": "kevinxdlolsigma",
+  "role_id": "1"
 }
+
 ###
 
 GET http://localhost:3000/api/v1/users?limit=10&offset=0&expand=role_id
+
+###
+
+GET http://localhost:3000/api/v1/users?limit=10&offset=0
+
+###
+
+GET http://localhost:3000/api/v1/users
 
 ###
 
@@ -22,15 +32,15 @@ GET http://localhost:3000/api/v1/users/1
 
 ###
 
-DELETE http://localhost:3000/api/v1/users/12
+DELETE http://localhost:3000/api/v1/users/1
 
 ###
 
-PUT http://localhost:3000/api/v1/users/13
+PUT http://localhost:3000/api/v1/users/2
 content-type: application/json
 
 {
-  "name": "Kevin Sneyder Hernandez Camacho"
+  "role_id": "2"
 }
 
 ###
