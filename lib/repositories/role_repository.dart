@@ -93,6 +93,7 @@ class Role extends Entity {
     );
   }
 
+  /// Role's name
   final String name;
 
   /// Convert to a map
@@ -119,7 +120,8 @@ class Role extends Entity {
 
   @override
   String toString() {
-    return 'Role(id: $id, name: $name, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Role(id: $id, name: $name, '
+        'createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
@@ -144,6 +146,7 @@ class RoleDTO {
     );
   }
 
+  /// Role's name
   final String? name;
 
   /// Convert to a map

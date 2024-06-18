@@ -9,13 +9,15 @@ class UserRepository extends Repository<User> {
   /// Create a new user repository
   UserRepository(super.pool) : roleRepository = RoleRepository(pool);
 
+  /// role repository
   final RoleRepository roleRepository;
 
   /// Create a new user
   Future<void> createUser(UserDTO userRequest) async {
     await pool.execute(
-      'INSERT INTO users (citizen_id, name, email, phone_number, password, role_id) '
-      'VALUES (:citizen_id, :name, :email, :phone_number, :password, :role_id)',
+      'INSERT INTO users (citizen_id, name, email, '
+      'phone_number, password, role_id) VALUES '
+      '(:citizen_id, :name, :email, :phone_number, :password, :role_id)',
       {
         'citizen_id': userRequest.citizenId,
         'name': userRequest.name,
@@ -30,7 +32,8 @@ class UserRepository extends Repository<User> {
   /// Get all users
   Future<List<User>> getUsers() async {
     final result = await pool.execute('SELECT id, citizen_id, name, '
-        'email, phone_number, password, role_id, created_at, updated_at FROM users');
+        'email, phone_number, password, role_id, created_at, '
+        'updated_at FROM users');
     return result.rows.map((row) {
       return User.fromMap(row.assoc());
     }).toList();
@@ -64,8 +67,9 @@ class UserRepository extends Repository<User> {
       return false;
     }
     await pool.execute(
-      'UPDATE users SET citizen_id = :citizen_id, name = :name, email = :email, '
-      'phone_number = :phone_number, password = :password, role_id = :role_id WHERE id = :id',
+      'UPDATE users SET citizen_id = :citizen_id, '
+      'name = :name, email = :email, phone_number = :phone_number, '
+      'password = :password, role_id = :role_id WHERE id = :id',
       {
         'id': savedUser.id,
         'citizen_id': userRequest.citizenId ?? savedUser.citizenId,
