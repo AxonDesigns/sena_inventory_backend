@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>login</title>
+</head>
+
+<body>
+  <form action="/api/v1/users/login" method="post" class="login-form">
+    <input type="text" name="email" placeholder="Email">
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Login</button>
+  </form>
+  <a href="/register">Register</a>
+</body>
+
+<script>
+  const form = document.querySelector('.login-form');
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const formDataJson = JSON.stringify(Object.fromEntries(formData));
+    fetch('/api/v1/users/login', {
+      method: 'POST',
+      body: formDataJson,
+    })
+      .then(response => response.json())
+      .then(data => {
+        window.location.replace('/');
+      });
+  });
+
+  function setCookie(name, value, days, secure = false, httpOnly = false, sameSite = 'Lax') {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    let cookieString = name + "=" + (value || "") + expires + "; path=/";
+    if (secure) {
+      cookieString += "; Secure";
+    }
+    if (httpOnly) {
+      cookieString += "; HttpOnly=true";
+    }
+    if (sameSite) {
+      cookieString += "; SameSite=" + sameSite;
+    }
+    document.cookie = cookieString;
+  }
+
+
+  function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+</script>
+
+</html>

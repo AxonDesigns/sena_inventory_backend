@@ -29,6 +29,7 @@ abstract class Entity {
 
   /// Entity updated at
   final DateTime updatedAt;
+
   @override
   String toString() {
     return 'Entity(id: $id, createdAt: $createdAt, updatedAt: $updatedAt)';

@@ -1,0 +1,12 @@
+html {
+  color-scheme: dark;
+}
+
+:root {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
