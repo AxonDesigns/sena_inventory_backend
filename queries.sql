@@ -1,3 +1,5 @@
+DROP DATABASE inventory;
+
 CREATE DATABASE IF NOT EXISTS inventory;
 
 USE inventory;

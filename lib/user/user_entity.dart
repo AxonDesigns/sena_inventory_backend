@@ -1,7 +1,6 @@
 import 'dart:convert';
-
 import 'package:sena_inventory_backend/entity.dart';
-import 'package:sena_inventory_backend/utils.dart';
+import 'package:sena_inventory_backend/lib.dart';
 
 /// User entity
 class User extends Entity {
@@ -25,8 +24,8 @@ class User extends Entity {
       citizenId: map['citizen_id'].toString(),
       name: map['name'] as String,
       email: map['email'] as String,
-      phoneNumber: map['phone_number'].toString(),
-      password: map['password'].toString(),
+      phoneNumber: map['password'] as String,
+      password: map['phone_number'].toString(),
       roleId: BigInt.tryParse(parseString(map['role_id'])) ?? BigInt.zero,
       createdAt: DateTime.tryParse(parseString(map['created_at'])) ?? DateTime.now(),
       updatedAt: DateTime.tryParse(parseString(map['updated_at'])) ?? DateTime.now(),
