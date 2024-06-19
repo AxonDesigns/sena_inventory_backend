@@ -4,13 +4,11 @@ import 'package:sena_inventory_backend/lib.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
-    HttpMethod.get => await _onGet(context),
+    HttpMethod.post => Response(
+        headers: {
+          HttpHeaders.setCookieHeader: invalidateToken,
+        },
+      ),
     _ => Response(statusCode: HttpStatus.methodNotAllowed),
   };
-}
-
-Future<Response> _onGet(RequestContext context) async {
-  if (!isAuthenticated(context)) return redirect('/login');
-
-  return Response(body: 'Hola, este contenido es protegido');
 }

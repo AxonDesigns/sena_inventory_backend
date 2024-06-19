@@ -11,6 +11,7 @@
 <body>
   <h1>Admin</h1>
   <div class="container"></div>
+  <button>Log Out</button>
 </body>
 
 <script>
@@ -24,6 +25,14 @@
         container.appendChild(userElement);
       });
     });
+
+  document.querySelector('button').addEventListener('click', () => {
+    fetch('/api/v1/users/logout', { method: 'POST' })
+      .then(response => {
+        window.location.replace('/login');
+
+      });
+  });
 </script>
 
 </html>

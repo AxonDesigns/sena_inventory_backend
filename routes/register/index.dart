@@ -4,7 +4,12 @@ import 'package:sena_inventory_backend/lib.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
-    HttpMethod.get => await render('register'),
+    HttpMethod.get => await _onGet(context),
     _ => Response(statusCode: HttpStatus.methodNotAllowed),
   };
+}
+
+Future<Response> _onGet(RequestContext context) async {
+  if (isAuthenticated(context)) return redirect('/');
+  return render('register');
 }
