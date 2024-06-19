@@ -30,9 +30,10 @@ Future<Response> render(
   );
 
   if (!file.existsSync()) return Response(body: 'Template not found');
+  final template = await file.readAsString();
 
   return Response(
-    body: await file.readAsString(),
+    body: template,
     statusCode: HttpStatus.found,
     headers: {
       HttpHeaders.contentTypeHeader: ContentType.html.value,

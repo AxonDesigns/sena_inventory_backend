@@ -6,7 +6,10 @@ Future<Response> onRequest(RequestContext context) async {
   if (isAuthenticated(context)) return redirect('/');
 
   return switch (context.request.method) {
-    HttpMethod.get => await render('login', headers: {HttpHeaders.setCookieHeader: invalidateToken}),
+    HttpMethod.get => await render(
+        'login',
+        headers: {HttpHeaders.setCookieHeader: invalidateToken},
+      ),
     _ => Response(statusCode: HttpStatus.methodNotAllowed),
   };
 }

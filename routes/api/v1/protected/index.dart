@@ -11,6 +11,5 @@ Future<Response> onRequest(RequestContext context) async {
 
 Future<Response> _onGet(RequestContext context) async {
   if (!isAuthenticated(context)) return redirect('/login');
-
   return Response(body: 'Hola, este contenido es protegido');
 }

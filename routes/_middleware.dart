@@ -23,10 +23,6 @@ Handler middleware(Handler handler) {
           shelf.corsHeaders(headers: {shelf.ACCESS_CONTROL_ALLOW_ORIGIN: '*'}),
         ),
       )
-      .use(
-        provider<UserRepository>((context) => UserRepository(pool)),
-      )
-      .use(
-        provider<RoleRepository>((context) => RoleRepository(pool)),
-      );
+      .use(provider<UserRepository>((context) => UserRepository(pool)))
+      .use(provider<RoleRepository>((context) => RoleRepository(pool)));
 }
