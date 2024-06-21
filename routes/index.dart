@@ -12,5 +12,6 @@ Future<Response> onRequest(RequestContext context) async {
 
 Future<Response> _onGet(RequestContext context) async {
   if (!isAuthenticated(context)) return redirect('/login');
-  return render('dashboard');
+  final user = await getUserFromToken(context);
+  return render('dashboard', values: {'name': user!.name});
 }

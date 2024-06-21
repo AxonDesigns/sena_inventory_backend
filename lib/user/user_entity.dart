@@ -18,7 +18,7 @@ class User extends Entity {
   });
 
   /// Create a new user entity from a map
-  factory User.fromMap(Map<String, dynamic> map) {
+  factory User.fromJson(Map<String, dynamic> map) {
     return User(
       id: BigInt.tryParse(parseString(map['id'])) ?? BigInt.zero,
       citizenId: map['citizen_id'].toString(),
@@ -32,13 +32,6 @@ class User extends Entity {
     );
   }
 
-  /// Create a new user entity from a json string
-  factory User.fromJson(String json) {
-    return User.fromMap(
-      jsonDecode(json) as Map<String, dynamic>,
-    );
-  }
-
   final String citizenId;
   final String name;
   final String email;
@@ -48,7 +41,7 @@ class User extends Entity {
 
   /// Convert to a map
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id.toString(),
       'citizen_id': citizenId,
@@ -59,21 +52,6 @@ class User extends Entity {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
-  }
-
-  /// Convert to a json string
-  @override
-  String toJson() => jsonEncode(toMap());
-
-  //TODO: Might be useless
-  /// Convert to a user request
-  UserDTO toUserDTO() {
-    return UserDTO(
-      citizenId: citizenId,
-      name: name,
-      phoneNumber: phoneNumber,
-      password: password,
-    );
   }
 
   @override

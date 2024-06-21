@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// Base entity
 abstract class Entity {
   /// Create a new entity
@@ -10,16 +8,13 @@ abstract class Entity {
   });
 
   /// Convert to a map
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id.toInt(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
   }
-
-  /// Convert to a json string
-  String toJson() => jsonEncode(toMap());
 
   /// Entity id
   final BigInt id;

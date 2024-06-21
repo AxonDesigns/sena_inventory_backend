@@ -41,7 +41,7 @@ class UserRepository extends Repository<User> {
     final result = await pool.execute('SELECT id, citizen_id, name, '
         'email, phone_number, password, role_id, created_at, updated_at FROM users');
     return result.rows.map((row) {
-      return User.fromMap(row.assoc());
+      return User.fromJson(row.assoc());
     }).toList();
   }
 
@@ -56,7 +56,7 @@ class UserRepository extends Repository<User> {
         });
     if (result.rows.isEmpty) return null;
 
-    return User.fromMap(result.rows.first.assoc());
+    return User.fromJson(result.rows.first.assoc());
   }
 
   /// Get a user by email and password
@@ -70,7 +70,7 @@ class UserRepository extends Repository<User> {
 
     if (result.rows.isEmpty) return null;
 
-    return User.fromMap(result.rows.first.assoc());
+    return User.fromJson(result.rows.first.assoc());
   }
 
   /// Delete a user by id

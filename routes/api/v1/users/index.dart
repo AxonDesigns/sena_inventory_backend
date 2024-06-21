@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sena_inventory_backend/lib.dart';
-import 'package:sena_inventory_backend/utils.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
@@ -20,12 +19,12 @@ Future<Response> _onGet(RequestContext context) async {
 
   final result = await Future.wait(
     users.map((user) async {
-      final userMap = user.toMap();
+      final userMap = user.toJson();
       if (query.expand.contains('role_id')) {
         final roleRepository = context.read<RoleRepository>();
         final role = await roleRepository.getRole(user.roleId);
         if (role != null) {
-          userMap['role'] = role.toMap();
+          userMap['role'] = role.toJson();
           userMap.remove('role_id');
         }
       }
@@ -50,7 +49,7 @@ Future<Response> _onPost(RequestContext context) async {
   if (createdUser == null) {
     return Response(statusCode: HttpStatus.notFound, body: 'User not found');
   }
-  return Response(statusCode: HttpStatus.created, body: createdUser.toJson());
+  return Response(statusCode: HttpStatus.created, body: jsonEncode(createdUser.toJson()));
 }
 
 Future<Map<String, dynamic>> handleExpand(

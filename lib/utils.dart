@@ -24,13 +24,18 @@ Future<Response> render(
   String templateName, {
   int statusCode = HttpStatus.found,
   Map<String, String> headers = const {},
+  Map<String, String> values = const {},
 }) async {
   final file = File(
     path.join(Directory.current.path, 'templates', '$templateName.html'),
   );
 
   if (!file.existsSync()) return Response(body: 'Template not found');
-  final template = await file.readAsString();
+  var template = await file.readAsString();
+
+  for (final key in values.keys) {
+    template = template.replaceAll('\${$key}', values[key]!);
+  }
 
   return Response(
     body: template,
@@ -88,6 +93,19 @@ bool isAuthenticated(RequestContext context) {
   return verifyToken(token) != null;
 }
 
+///Get user from token
+Future<User?> getUserFromToken(RequestContext context) async {
+  final token = getTokenFromCookies(context);
+  if (token == null) return null;
+  final tokenData = verifyToken(token);
+  if (tokenData == null) return null;
+  // ignore: avoid_dynamic_calls
+  final email = tokenData.payload['email'].toString();
+  final userRepository = context.read<UserRepository>();
+  return userRepository.getUserByEmail(email);
+}
+
+/// Invalidate token
 String get invalidateToken {
   return '$kTokenKey=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly=true; SameSite=Strict; secure=true; path=/';
 }

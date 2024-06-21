@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
@@ -18,7 +19,7 @@ Future<Response> _onGet(RequestContext context, String id) async {
   if (user == null) {
     return Response(statusCode: HttpStatus.notFound);
   }
-  return Response(body: user.toJson());
+  return Response(body: jsonEncode(user.toJson()));
 }
 
 Future<Response> _onDelete(RequestContext context, String id) async {

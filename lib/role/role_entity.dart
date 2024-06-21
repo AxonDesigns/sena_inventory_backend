@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:sena_inventory_backend/entity.dart';
 import 'package:sena_inventory_backend/utils.dart';
 
@@ -14,7 +12,7 @@ class Role extends Entity {
   });
 
   /// Create a new role entity from a map
-  factory Role.fromMap(Map<String, dynamic> map) {
+  factory Role.fromJson(Map<String, dynamic> map) {
     final id = BigInt.tryParse(parseString(map['id']));
     final createdAt = DateTime.tryParse(parseString(map['created_at']));
     final updatedAt = DateTime.tryParse(parseString(map['updated_at']));
@@ -27,19 +25,12 @@ class Role extends Entity {
     );
   }
 
-  /// Create a new role entity from a json string
-  factory Role.fromJson(String json) {
-    return Role.fromMap(
-      jsonDecode(json) as Map<String, dynamic>,
-    );
-  }
-
   /// Role's name
   final String name;
 
   /// Convert to a map
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id.toString(),
       'name': name,
@@ -47,10 +38,6 @@ class Role extends Entity {
       'updated_at': updatedAt.toIso8601String(),
     };
   }
-
-  /// Convert to a json string
-  @override
-  String toJson() => jsonEncode(toMap());
 
   /// Convert to a role request
   RoleDTO toRoleDTO() {
@@ -80,13 +67,6 @@ class RoleDTO {
     );
   }
 
-  /// Convert to a role request from a json string
-  factory RoleDTO.fromJson(String json) {
-    return RoleDTO.fromMap(
-      jsonDecode(json) as Map<String, dynamic>,
-    );
-  }
-
   /// Role's name
   final String? name;
 
@@ -96,9 +76,6 @@ class RoleDTO {
       'name': name,
     };
   }
-
-  /// Convert to a json string
-  String toJson() => jsonEncode(toMap());
 
   /// Convert to a role
   Role toRole() {

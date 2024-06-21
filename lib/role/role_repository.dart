@@ -20,7 +20,7 @@ class RoleRepository extends Repository<Role> {
       'SELECT id, name, created_at, updated_at FROM roles',
     );
     return result.rows.map((row) {
-      return Role.fromMap(row.assoc());
+      return Role.fromJson(row.assoc());
     }).toList();
   }
 
@@ -33,7 +33,7 @@ class RoleRepository extends Repository<Role> {
     );
     if (result.rows.isEmpty) return null;
 
-    return Role.fromMap(result.rows.first.assoc());
+    return Role.fromJson(result.rows.first.assoc());
   }
 
   /// Delete a role by id
