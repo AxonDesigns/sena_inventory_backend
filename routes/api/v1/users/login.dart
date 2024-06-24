@@ -36,7 +36,6 @@ Future<Response> _onPost(RequestContext context) async {
   );
   final date = DateTime.now().add(const Duration(hours: 1));
   final formattedDate = '${date.year}-${date.month}-${date.day} ${date.hour}:${date.minute}:${date.second}';
-  print(formattedDate);
   return Response(
     body: jsonEncode(token),
     headers: {

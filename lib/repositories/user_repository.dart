@@ -1,6 +1,6 @@
+import 'package:sena_inventory_backend/models/models.dart';
+import 'package:sena_inventory_backend/repositories/role_repository.dart';
 import 'package:sena_inventory_backend/repository.dart';
-import 'package:sena_inventory_backend/role/role_repository.dart';
-import 'package:sena_inventory_backend/user/user_entity.dart';
 
 /// User repository
 class UserRepository extends Repository<User> {
@@ -37,9 +37,13 @@ class UserRepository extends Repository<User> {
   }
 
   /// Get all users
-  Future<List<User>> getUsers() async {
-    final result = await pool.execute('SELECT id, citizen_id, name, '
-        'email, phone_number, password, role_id, created_at, updated_at FROM users');
+  Future<List<User>> getUsers(int limit, int offset) async {
+    final result = await pool.execute(
+      'SELECT id, citizen_id, name, '
+      'email, phone_number, password, role_id, created_at, updated_at FROM users '
+      'LIMIT :limit OFFSET :offset;',
+      {'limit': limit, 'offset': offset},
+    );
     return result.rows.map((row) {
       return User.fromJson(row.assoc());
     }).toList();
@@ -48,12 +52,11 @@ class UserRepository extends Repository<User> {
   /// Get a user by id
   Future<User?> getUser(BigInt id) async {
     final result = await pool.execute(
-        'SELECT id, citizen_id, name, '
-        'email, phone_number, password, role_id, created_at, '
-        'updated_at FROM users WHERE id = :id',
-        {
-          'id': id,
-        });
+      'SELECT id, citizen_id, name, '
+      'email, phone_number, password, role_id, created_at, '
+      'updated_at FROM users WHERE id = :id;',
+      {'id': id},
+    );
     if (result.rows.isEmpty) return null;
 
     return User.fromJson(result.rows.first.assoc());
@@ -64,7 +67,8 @@ class UserRepository extends Repository<User> {
     final result = await pool.execute(
       'SELECT id, citizen_id, name, '
       'email, phone_number, password, role_id, created_at, '
-      'updated_at FROM users WHERE email = :email',
+      'updated_at FROM users WHERE email = :email '
+      'LIMIT 1;',
       {'email': email},
     );
 
@@ -75,9 +79,10 @@ class UserRepository extends Repository<User> {
 
   /// Delete a user by id
   Future<void> deleteUser(BigInt id) async {
-    await pool.execute('DELETE FROM users WHERE id = :id', {
-      'id': id,
-    });
+    await pool.execute(
+      'DELETE FROM users WHERE id = :id',
+      {'id': id},
+    );
   }
 
   /// Update a user by id

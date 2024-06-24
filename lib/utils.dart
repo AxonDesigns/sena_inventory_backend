@@ -20,7 +20,7 @@ String parseString(dynamic value) {
 }
 
 /// Render a HTML template
-Future<Response> render(
+Future<Response> renderTemplate(
   String templateName, {
   int statusCode = HttpStatus.found,
   Map<String, String> headers = const {},
@@ -32,6 +32,29 @@ Future<Response> render(
 
   if (!file.existsSync()) return Response(body: 'Template not found');
   var template = await file.readAsString();
+
+  for (final key in values.keys) {
+    template = template.replaceAll('\${$key}', values[key]!);
+  }
+
+  return Response(
+    body: template,
+    statusCode: HttpStatus.found,
+    headers: {
+      HttpHeaders.contentTypeHeader: ContentType.html.value,
+      ...headers,
+    },
+  );
+}
+
+/// Render a string
+Future<Response> renderString(
+  String value, {
+  int statusCode = HttpStatus.found,
+  Map<String, String> headers = const {},
+  Map<String, String> values = const {},
+}) async {
+  var template = value;
 
   for (final key in values.keys) {
     template = template.replaceAll('\${$key}', values[key]!);
@@ -108,4 +131,32 @@ Future<User?> getUserFromToken(RequestContext context) async {
 /// Invalidate token
 String get invalidateToken {
   return '$kTokenKey=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly=true; SameSite=Strict; secure=true; path=/';
+}
+
+/// Parse expand fields
+Future<Map<String, dynamic>> parseExpand(RequestContext context, List<String> expandList, Map<String, dynamic> from) async {
+  for (final expand in expandList) {
+    if (from.containsKey(expand)) {
+      final name = expand.split('_').first;
+      final expanded = await parseFromId(context, name, BigInt.parse(from[expand].toString()));
+      if (expanded != null) {
+        from[name] = expanded;
+        from.remove(expand);
+      }
+    }
+  }
+
+  return from;
+}
+
+Future<Map<String, dynamic>?> parseFromId(RequestContext context, String name, BigInt id) async {
+  switch (name) {
+    case 'role':
+      final roleRepository = context.read<RoleRepository>();
+      final role = await roleRepository.getRole(id);
+      if (role == null) return null;
+      return role.toJson();
+    default:
+      return null;
+  }
 }

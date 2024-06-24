@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:bcrypt/bcrypt.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -12,7 +11,7 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final body = await context.request.json() as Map<String, dynamic>;
+  final body = await context.request.json() as Json;
   final userRepository = context.read<UserRepository>();
   final user = await userRepository.getUserByEmail(body['email'].toString());
   if (user != null) {
@@ -22,7 +21,7 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
   body['password'] = BCrypt.hashpw(body['password'].toString(), BCrypt.gensalt());
-  final success = await userRepository.createUser(UserDTO.fromJson(jsonEncode(body)));
+  final success = await userRepository.createUser(UserDTO.fromJson(body));
   if (!success) {
     return Response(statusCode: HttpStatus.badRequest, body: 'User creation failed');
   }

@@ -14,12 +14,17 @@ Future<Response> onRequest(RequestContext context, String id) async {
 }
 
 Future<Response> _onGet(RequestContext context, String id) async {
+  final query = parseQuery(context.request.uri.queryParameters);
   final userRepository = context.read<UserRepository>();
   final user = await userRepository.getUser(BigInt.parse(id));
   if (user == null) {
     return Response(statusCode: HttpStatus.notFound);
   }
-  return Response(body: jsonEncode(user.toJson()));
+
+  final json = await parseExpand(context, query.expand, user.toJson());
+  json.remove('password');
+
+  return Response(body: jsonEncode(json));
 }
 
 Future<Response> _onDelete(RequestContext context, String id) async {
@@ -30,7 +35,7 @@ Future<Response> _onDelete(RequestContext context, String id) async {
 
 Future<Response> _onPut(RequestContext context, String id) async {
   final userRepository = context.read<UserRepository>();
-  final userRequest = UserDTO.fromMap(await context.request.json() as Map<String, dynamic>);
+  final userRequest = UserDTO.fromJson(await context.request.json() as Json);
   await userRepository.updateUser(userRequest, BigInt.parse(id));
   return Response();
 }

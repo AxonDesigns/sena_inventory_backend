@@ -1,5 +1,5 @@
 import 'package:sena_inventory_backend/entity.dart';
-import 'package:sena_inventory_backend/utils.dart';
+import 'package:sena_inventory_backend/lib.dart';
 
 /// Role entity
 class Role extends Entity {
@@ -12,7 +12,7 @@ class Role extends Entity {
   });
 
   /// Create a new role entity from a map
-  factory Role.fromJson(Map<String, dynamic> map) {
+  factory Role.fromJson(Json map) {
     final id = BigInt.tryParse(parseString(map['id']));
     final createdAt = DateTime.tryParse(parseString(map['created_at']));
     final updatedAt = DateTime.tryParse(parseString(map['updated_at']));
@@ -30,7 +30,7 @@ class Role extends Entity {
 
   /// Convert to a map
   @override
-  Map<String, dynamic> toJson() {
+  Json toJson() {
     return {
       'id': id.toString(),
       'name': name,
@@ -61,7 +61,7 @@ class RoleDTO {
   });
 
   /// Convert to a map from a json string
-  factory RoleDTO.fromMap(Map<String, dynamic> map) {
+  factory RoleDTO.fromMap(Json map) {
     return RoleDTO(
       name: map['name']?.toString(),
     );
@@ -71,7 +71,7 @@ class RoleDTO {
   final String? name;
 
   /// Convert to a map
-  Map<String, dynamic> toMap() {
+  Json toMap() {
     return {
       'name': name,
     };

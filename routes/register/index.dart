@@ -11,5 +11,5 @@ Future<Response> onRequest(RequestContext context) async {
 
 Future<Response> _onGet(RequestContext context) async {
   if (isAuthenticated(context)) return redirect('/');
-  return render('register');
+  return renderTemplate('register');
 }

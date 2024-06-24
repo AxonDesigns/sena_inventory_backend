@@ -1,5 +1,5 @@
+import 'package:sena_inventory_backend/models/models.dart';
 import 'package:sena_inventory_backend/repository.dart';
-import 'package:sena_inventory_backend/role/role_entity.dart';
 
 /// Role repository
 class RoleRepository extends Repository<Role> {
@@ -15,9 +15,11 @@ class RoleRepository extends Repository<Role> {
   }
 
   /// Get all roles
-  Future<List<Role>> getRoles() async {
+  Future<List<Role>> getRoles(int limit, int offset) async {
     final result = await pool.execute(
-      'SELECT id, name, created_at, updated_at FROM roles',
+      'SELECT id, name, created_at, updated_at FROM roles '
+      'LIMIT :limit OFFSET :offset;',
+      {'limit': limit, 'offset': offset},
     );
     return result.rows.map((row) {
       return Role.fromJson(row.assoc());

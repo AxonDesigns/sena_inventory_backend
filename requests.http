@@ -32,6 +32,10 @@ GET http://localhost:3000/api/v1/users/1
 
 ###
 
+GET http://localhost:3000/api/v1/users/1?expand=role_id
+
+###
+
 DELETE http://localhost:3000/api/v1/users/1
 
 ###

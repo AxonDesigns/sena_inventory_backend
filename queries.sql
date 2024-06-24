@@ -218,3 +218,18 @@ CREATE TABLE IF NOT EXISTS transaction_products (
     CONSTRAINT fk_transaction_id FOREIGN KEY (transaction_id) REFERENCES transactions (id),
     CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES products (id)
 );
+
+SELECT
+    id,
+    citizen_id,
+    name,
+    email,
+    phone_number,
+    password,
+    role_id,
+    created_at,
+    updated_at
+FROM users
+LIMIT 10
+OFFSET
+    0;

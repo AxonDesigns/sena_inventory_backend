@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:sena_inventory_backend/entity.dart';
 import 'package:sena_inventory_backend/lib.dart';
 
@@ -18,7 +17,7 @@ class User extends Entity {
   });
 
   /// Create a new user entity from a map
-  factory User.fromJson(Map<String, dynamic> map) {
+  factory User.fromJson(Json map) {
     return User(
       id: BigInt.tryParse(parseString(map['id'])) ?? BigInt.zero,
       citizenId: map['citizen_id'].toString(),
@@ -41,7 +40,7 @@ class User extends Entity {
 
   /// Convert to a map
   @override
-  Map<String, dynamic> toJson() {
+  Json toJson() {
     return {
       'id': id.toString(),
       'citizen_id': citizenId,
@@ -75,7 +74,7 @@ class UserDTO {
   });
 
   /// Convert to a map from a json string
-  factory UserDTO.fromMap(Map<String, dynamic> map) {
+  factory UserDTO.fromJson(Json map) {
     return UserDTO(
       citizenId: map['citizen_id']?.toString(),
       name: map['name']?.toString(),
@@ -83,13 +82,6 @@ class UserDTO {
       phoneNumber: map['phone_number']?.toString(),
       password: map['password']?.toString(),
       roleId: BigInt.tryParse(parseString(map['role_id'])),
-    );
-  }
-
-  /// Convert to a user request from a json string
-  factory UserDTO.fromJson(String json) {
-    return UserDTO.fromMap(
-      jsonDecode(json) as Map<String, dynamic>,
     );
   }
 
@@ -101,7 +93,7 @@ class UserDTO {
   final BigInt? roleId;
 
   /// Convert to a map
-  Map<String, dynamic> toMap() {
+  Json toJson() {
     return {
       'citizen_id': citizenId,
       'name': name,
@@ -110,9 +102,6 @@ class UserDTO {
       'password': password,
     };
   }
-
-  /// Convert to a json string
-  String toJson() => jsonEncode(toMap());
 
   /// Convert to a user
   User toUser() {

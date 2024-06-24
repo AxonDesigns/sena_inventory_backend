@@ -6,7 +6,7 @@ Future<Response> onRequest(RequestContext context) async {
   if (isAuthenticated(context)) return redirect('/');
 
   return switch (context.request.method) {
-    HttpMethod.get => await render(
+    HttpMethod.get => await renderTemplate(
         'login',
         headers: {HttpHeaders.setCookieHeader: invalidateToken},
       ),

@@ -1,6 +1,8 @@
-export 'utils.dart';
-export 'role/role_entity.dart';
-export 'role/role_repository.dart';
-export 'user/user_entity.dart';
-export 'user/user_repository.dart';
 export 'constants.dart';
+export 'models/models.dart';
+export 'repositories/role_repository.dart';
+export 'repositories/user_repository.dart';
+export 'utils.dart';
+
+/// JSON type
+typedef Json = Map<String, dynamic>;

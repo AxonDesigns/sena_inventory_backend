@@ -12,7 +12,10 @@ Future<Response> onRequest(RequestContext context) async {
 Future<Response> _onGet(RequestContext context) async {
   if (!isAuthenticated(context)) return redirect('/login');
   final user = await getUserFromToken(context);
-  if (user == null) return Response(body: 'Hola <UNKNOWN>, este contenido es protegido');
 
-  return Response(body: 'Hola ${user.name}, este contenido es protegido');
+  return renderString(
+    r'<h1>Hola ${name}</h1> '
+    '<h2>Este contenido es protegido</h2>',
+    values: {'name': user?.name ?? '<UNKNOWN>'},
+  );
 }
