@@ -11,9 +11,11 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final body = await context.request.json() as Json;
+  final body = await context.request.body();
+  final formData = parseFormData(body);
+
   final userRepository = context.read<UserRepository>();
-  final user = await userRepository.getUserByEmail(body['email'].toString());
+  final user = await userRepository.getUserByEmail(formData['email'].toString());
   if (user != null) {
     return Response(
       statusCode: HttpStatus.unauthorized,
@@ -21,8 +23,8 @@ Future<Response> _onPost(RequestContext context) async {
     );
   }
 
-  body['password'] = BCrypt.hashpw(body['password'].toString(), BCrypt.gensalt());
-  final success = await userRepository.createUser(UserDTO.fromJson(body));
+  formData['password'] = BCrypt.hashpw(formData['password'].toString(), BCrypt.gensalt());
+  final success = await userRepository.createUser(UserDTO.fromJson(formData));
   if (!success) {
     return Response(statusCode: HttpStatus.badRequest, body: 'User creation failed');
   }

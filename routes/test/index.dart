@@ -17,13 +17,7 @@ Future<Response> _onGet(RequestContext context) async {
 
 Future<Response> _onPost(RequestContext context) async {
   final body = await context.request.body();
-  final map = <String, String>{};
-  body.split('&').forEach(
-    (element) {
-      final pair = element.split('=');
-      map[Uri.decodeQueryComponent(pair[0])] = Uri.decodeQueryComponent(pair[1]);
-    },
-  );
-  print(map);
+  final formData = parseFormData(body);
+  print(formData);
   return redirect('/');
 }

@@ -160,3 +160,15 @@ Future<Map<String, dynamic>?> parseFromId(RequestContext context, String name, B
       return null;
   }
 }
+
+Map<String, String> parseFormData(String value) {
+  final map = <String, String>{};
+  value.split('&').forEach(
+    (element) {
+      final pair = element.split('=');
+      map[Uri.decodeQueryComponent(pair[0])] = Uri.decodeQueryComponent(pair[1]);
+    },
+  );
+
+  return map;
+}

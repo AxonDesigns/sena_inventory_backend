@@ -19,26 +19,9 @@
     <input type="text" name="phone_number" placeholder="Phone number">
     <input type="password" name="password" placeholder="Password">
     <input type="password" name="password_confirmation" placeholder="Password confirmation">
-    <button type="submit">Login</button>
+    <button type="submit">Register</button>
     <a href="/login">Login</a>
   </form>
 </body>
-
-<script>
-  const form = document.querySelector('.register-form');
-  form.addEventListener('submit', event => {
-    event.preventDefault();
-    const formData = new FormData(form);
-    const formDataJson = JSON.stringify(Object.fromEntries(formData));
-    fetch('/api/v1/auth/register', {
-      method: 'POST',
-      body: formDataJson,
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-      });
-  });
-</script>
 
 </html>
