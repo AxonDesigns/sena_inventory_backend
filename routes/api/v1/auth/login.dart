@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:bcrypt/bcrypt.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -29,13 +30,12 @@ Future<Response> _onPost(RequestContext context) async {
 
   final jwt = JWT({'email': body['email']});
   final env = DotEnv(includePlatformEnvironment: true)..load();
+  final expDuration = Duration(seconds: int.tryParse(env['JWT_EXPIRES_IN'] ?? '') ?? 3600);
 
-  final token = jwt.sign(
-    SecretKey(env['SECRET_JWT_KEY'] ?? ''),
-    expiresIn: const Duration(hours: 1),
-  );
-  final date = DateTime.now().add(const Duration(hours: 1));
-  final formattedDate = '${date.year}-${date.month}-${date.day} ${date.hour}:${date.minute}:${date.second}';
+  final token = jwt.sign(SecretKey(env['SECRET_JWT_KEY'] ?? ''), expiresIn: expDuration);
+  final date = DateTime.now().add(expDuration).toUtc();
+  final formattedDate =
+      '${kDays[date.weekday - 1]}, ${_addPadding(date.day)} ${kMonths[date.month - 1]} ${date.year} ${_addPadding(date.hour)}:${_addPadding(date.minute)}:${_addPadding(date.second)} GMT';
   return Response(
     body: jsonEncode(token),
     headers: {
@@ -44,4 +44,8 @@ Future<Response> _onPost(RequestContext context) async {
           ' HttpOnly=true; SameSite=Strict; secure=true; path=/',
     },
   );
+}
+
+String _addPadding(int value) {
+  return value.toString().padLeft(2, '0');
 }

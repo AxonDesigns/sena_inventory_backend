@@ -14,6 +14,7 @@ Future<Response> _onGet(RequestContext context) async {
   final user = await getUserFromToken(context);
 
   return renderString(
+    '<link rel="stylesheet" href="css/global.css"> '
     r'<h1>Hola ${name}</h1> '
     '<h2>Este contenido es protegido</h2>',
     values: {'name': user?.name ?? '<UNKNOWN>'},
