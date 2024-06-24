@@ -20,11 +20,12 @@ Future<Response> _onPost(RequestContext context) async {
       body: 'User already exists',
     );
   }
+
   body['password'] = BCrypt.hashpw(body['password'].toString(), BCrypt.gensalt());
   final success = await userRepository.createUser(UserDTO.fromJson(body));
   if (!success) {
     return Response(statusCode: HttpStatus.badRequest, body: 'User creation failed');
   }
 
-  return Response(statusCode: HttpStatus.created, body: 'User Registered');
+  return redirect('/login');
 }

@@ -13,5 +13,8 @@ Future<Response> onRequest(RequestContext context) async {
 Future<Response> _onGet(RequestContext context) async {
   if (!isAuthenticated(context)) return redirect('/login');
   final user = await getUserFromToken(context);
-  return renderTemplate('dashboard', values: {'name': user?.name ?? '<UNKNOWN>'});
+  return renderTemplate(
+    'dashboard',
+    values: {'name': user?.name ?? '<UNKNOWN>'},
+  );
 }

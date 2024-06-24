@@ -1,3 +1,4 @@
+-- Active: 1718724631317@@127.0.0.1@3306@inventory
 DROP DATABASE inventory;
 
 CREATE DATABASE IF NOT EXISTS inventory;
