@@ -14,15 +14,23 @@ Future<Response> _onPost(RequestContext context) async {
   final body = await context.request.body();
   final formData = parseFormData(body);
 
-  final userRepository = context.read<UserRepository>();
-  final user = await userRepository.getUserByEmail(formData['email'].toString());
-  if (user != null) {
+  if (formData['password'] != formData['password_confirmation']) {
     return Response(
-      statusCode: HttpStatus.unauthorized,
-      body: 'User already exists',
+      statusCode: HttpStatus.badRequest,
+      body: 'Passwords do not match',
     );
   }
 
+  final userRepository = context.read<UserRepository>();
+  final user = await userRepository.getUserByEmail(formData['email'].toString());
+  if (user != null) {
+    return redirect(
+      '/register',
+      statusCode: HttpStatus.badRequest,
+      body: 'User already exists',
+    );
+  }
+  print(formData);
   formData['password'] = BCrypt.hashpw(formData['password'].toString(), BCrypt.gensalt());
   final success = await userRepository.createUser(UserDTO.fromJson(formData));
   if (!success) {

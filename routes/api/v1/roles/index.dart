@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sena_inventory_backend/lib.dart';
@@ -10,13 +11,10 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onGet(RequestContext context) async {
-  final user = context.tryRead<User>();
-  if (user == null) return redirect('/login');
+  final query = parseQuery(context.request.uri.queryParameters);
+  final roleRepository = context.read<RoleRepository>();
+  final roles = await roleRepository.getRoles(query.limit, query.offset);
+  final json = roles.map((role) => role.toJson()).toList();
 
-  return renderString(
-    '<link rel="stylesheet" href="css/global.css"> '
-    r'<h1>Hola ${name}</h1> '
-    '<h2>Este contenido es protegido</h2>',
-    values: {'name': user.name},
-  );
+  return Response(body: jsonEncode(json));
 }

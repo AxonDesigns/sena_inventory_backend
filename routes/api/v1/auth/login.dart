@@ -24,25 +24,28 @@ Future<Response> _onPost(RequestContext context) async {
 
   if (user == null) return Response(statusCode: HttpStatus.unauthorized);
 
-  final isValid = BCrypt.checkpw(formData['password'].toString(), user.password);
-  if (!isValid) return Response(statusCode: HttpStatus.unauthorized);
+  final isPasswordValid = BCrypt.checkpw(formData['password'].toString(), user.password);
+  if (!isPasswordValid) return Response(statusCode: HttpStatus.unauthorized);
 
   final jwt = JWT({'email': formData['email']});
-  final env = DotEnv(includePlatformEnvironment: true)..load();
+  final env = context.read<DotEnv>();
   final expDuration = Duration(seconds: int.tryParse(env['JWT_EXPIRES_IN'] ?? '') ?? 3600);
 
   final token = jwt.sign(SecretKey(env['SECRET_JWT_KEY'] ?? ''), expiresIn: expDuration);
   final date = DateTime.now().add(expDuration).toUtc();
   final formattedDate =
       '${kDays[date.weekday - 1]}, ${_addPadding(date.day)} ${kMonths[date.month - 1]} ${date.year} ${_addPadding(date.hour)}:${_addPadding(date.minute)}:${_addPadding(date.second)} GMT';
-  return redirect('/', headers: {
-    HttpHeaders.setCookieHeader: 'token=$token; '
-        'Expires=$formattedDate; '
-        'HttpOnly=true; '
-        'SameSite=Strict; '
-        'secure=true; '
-        'path=/',
-  });
+  return redirect(
+    '/',
+    headers: {
+      HttpHeaders.setCookieHeader: 'token=$token; '
+          'Expires=$formattedDate; '
+          'HttpOnly=true; '
+          'SameSite=Strict; '
+          'secure=true; '
+          'path=/',
+    },
+  );
 }
 
 String _addPadding(int value) {

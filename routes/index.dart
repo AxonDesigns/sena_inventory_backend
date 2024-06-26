@@ -11,10 +11,11 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onGet(RequestContext context) async {
-  if (!isAuthenticated(context)) return redirect('/login');
-  final user = await getUserFromToken(context);
+  final user = context.tryRead<User>();
+  if (user == null) return redirect('/login');
+
   return renderTemplate(
     'dashboard',
-    values: {'name': user?.name ?? '<UNKNOWN>'},
+    values: {'name': user.name},
   );
 }

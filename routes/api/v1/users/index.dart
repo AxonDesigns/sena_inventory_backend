@@ -17,17 +17,20 @@ Future<Response> _onGet(RequestContext context) async {
   final userRepository = context.read<UserRepository>();
   final users = await userRepository.getUsers(query.limit, query.offset);
 
-  final json = await Future.wait(
+  /*final json = await Future.wait(
     users.map((user) async {
       final userJson = user.toJson()..remove('password');
       return parseExpand(context, query.expand, userJson);
     }),
-  );
+  );*/
+
+  final json = users.map((user) => user.toJson()).toList();
 
   return Response(body: jsonEncode(json));
 }
 
 Future<Response> _onPost(RequestContext context) async {
+  print(await context.request.json() as Json);
   final user = UserDTO.fromJson(await context.request.json() as Json);
   final userRepository = context.read<UserRepository>();
   await userRepository.createUser(user);
@@ -39,6 +42,7 @@ Future<Response> _onPost(RequestContext context) async {
       body: 'Error creating user',
     );
   }
+  print(createdId);
   final createdUser = await userRepository.getUser(createdId);
   if (createdUser == null) {
     return Response(

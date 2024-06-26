@@ -39,7 +39,7 @@ Future<Response> renderTemplate(
 
   return Response(
     body: template,
-    statusCode: HttpStatus.found,
+    statusCode: statusCode,
     headers: {
       HttpHeaders.contentTypeHeader: ContentType.html.value,
       ...headers,
@@ -78,14 +78,14 @@ Future<Response> redirect(
   String? body,
 }) async {
   return Response(
-    statusCode: HttpStatus.found,
+    statusCode: statusCode,
     body: body,
     headers: {HttpHeaders.locationHeader: url, ...headers},
   );
 }
 
-/// Get token from cookie
-String? getTokenFromCookies(RequestContext context) {
+/// Get access token from cookie
+String? getAccessToken(RequestContext context) {
   final cookies = context.request.headers['cookie']?.split(';') ?? [];
   try {
     return cookies
@@ -110,7 +110,7 @@ JWT? verifyToken(String token) {
 
 /// Is user authenticated?
 bool isAuthenticated(RequestContext context) {
-  final token = getTokenFromCookies(context);
+  final token = getAccessToken(context);
   if (token == null) return false;
 
   return verifyToken(token) != null;
@@ -118,7 +118,7 @@ bool isAuthenticated(RequestContext context) {
 
 ///Get user from token
 Future<User?> getUserFromToken(RequestContext context) async {
-  final token = getTokenFromCookies(context);
+  final token = getAccessToken(context);
   if (token == null) return null;
   final tokenData = verifyToken(token);
   if (tokenData == null) return null;
@@ -171,4 +171,16 @@ Map<String, String> parseFormData(String value) {
   );
 
   return map;
+}
+
+/// Extension for RequestContext
+extension BetterRequestContext on RequestContext {
+  /// Tries to read an object from the context, returns null if not found
+  T? tryRead<T>() {
+    try {
+      return read<T>();
+    } catch (e) {
+      return null;
+    }
+  }
 }

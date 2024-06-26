@@ -16,6 +16,8 @@ Handler middleware(Handler handler) {
     databaseName: env['DB_NAME'],
   );
 
+  final userRepository = UserRepository(pool);
+
   return handler
       .use(requestLogger())
       .use(
@@ -23,6 +25,14 @@ Handler middleware(Handler handler) {
           shelf.corsHeaders(headers: {shelf.ACCESS_CONTROL_ALLOW_ORIGIN: '*'}),
         ),
       )
-      .use(provider<UserRepository>((context) => UserRepository(pool)))
-      .use(provider<RoleRepository>((context) => RoleRepository(pool)));
+      .use(provider<DotEnv>((context) => env))
+      .use(provider<UserRepository>((context) => userRepository))
+      .use(provider<RoleRepository>((context) => RoleRepository(pool)))
+      .use(
+    authentication(
+      authenticator: (context, token) {
+        return userRepository.getUserByAccessToken(token);
+      },
+    ),
+  );
 }

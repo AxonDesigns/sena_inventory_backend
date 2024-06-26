@@ -14,7 +14,7 @@
   <form action="/api/v1/auth/register" method="post" class="register-form">
     <input type="text" name="name" placeholder="Name">
     <input type="text" name="citizen_id" placeholder="Citizen id">
-    <input type="text" name="role_id" placeholder="Role id">
+    <select name="role_id"></select>
     <input type="text" name="email" placeholder="Email">
     <input type="text" name="phone_number" placeholder="Phone number">
     <input type="password" name="password" placeholder="Password">
@@ -23,5 +23,18 @@
     <a href="/login">Login</a>
   </form>
 </body>
+
+<script>
+  fetch('/api/v1/roles', { method: 'GET' })
+    .then(response => response.json())
+    .then(users => {
+      users.forEach(user => {
+        const userElement = document.createElement('option');
+        userElement.value = user.id;
+        userElement.innerText = user.name;
+        document.querySelector('select').appendChild(userElement);
+      });
+    });
+</script>
 
 </html>

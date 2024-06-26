@@ -1,4 +1,5 @@
 export 'constants.dart';
+export 'middlewares.dart';
 export 'models/models.dart';
 export 'repositories/role_repository.dart';
 export 'repositories/user_repository.dart';
