@@ -178,7 +178,7 @@ extension BetterRequestContext on RequestContext {
   /// Tries to read an object from the context, returns null if not found
   T? tryRead<T>() {
     try {
-      return read<T>();
+      return read<T?>();
     } catch (e) {
       return null;
     }

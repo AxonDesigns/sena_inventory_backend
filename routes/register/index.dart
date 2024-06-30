@@ -10,6 +10,6 @@ Future<Response> onRequest(RequestContext context) async {
 }
 
 Future<Response> _onGet(RequestContext context) async {
-  if (isAuthenticated(context)) return redirect('/');
+  //if (isAuthenticated(context)) return redirect('/');
   return renderTemplate('register');
 }
