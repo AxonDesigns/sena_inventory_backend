@@ -22,7 +22,7 @@ String parseString(dynamic value) {
 /// Render a HTML template
 Future<Response> renderTemplate(
   String templateName, {
-  int statusCode = HttpStatus.found,
+  int statusCode = HttpStatus.ok,
   Map<String, String> headers = const {},
   Map<String, String> values = const {},
 }) async {
@@ -80,7 +80,10 @@ Future<Response> redirect(
   return Response(
     statusCode: statusCode,
     body: body,
-    headers: {HttpHeaders.locationHeader: url, ...headers},
+    headers: {
+      HttpHeaders.locationHeader: url,
+      ...headers,
+    },
   );
 }
 
@@ -110,22 +113,7 @@ JWT? verifyToken(String token) {
 
 /// Is user authenticated?
 bool isAuthenticated(RequestContext context) {
-  final token = getAccessToken(context);
-  if (token == null) return false;
-
-  return verifyToken(token) != null;
-}
-
-///Get user from token
-Future<User?> getUserFromToken(RequestContext context) async {
-  final token = getAccessToken(context);
-  if (token == null) return null;
-  final tokenData = verifyToken(token);
-  if (tokenData == null) return null;
-  // ignore: avoid_dynamic_calls
-  final email = tokenData.payload['email'].toString();
-  final userRepository = context.read<UserRepository>();
-  return userRepository.getUserByEmail(email);
+  return context.tryRead<User>() != null;
 }
 
 /// Invalidate token
