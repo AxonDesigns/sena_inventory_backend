@@ -16,8 +16,5 @@ Future<Response> _onGet(RequestContext context) async {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  final body = await context.request.body();
-  final formData = parseFormData(body);
-  print(formData);
   return redirect('/');
 }

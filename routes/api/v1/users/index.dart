@@ -30,7 +30,6 @@ Future<Response> _onGet(RequestContext context) async {
 }
 
 Future<Response> _onPost(RequestContext context) async {
-  print(await context.request.json() as Json);
   final user = UserDTO.fromJson(await context.request.json() as Json);
   final userRepository = context.read<UserRepository>();
   await userRepository.createUser(user);
@@ -42,7 +41,6 @@ Future<Response> _onPost(RequestContext context) async {
       body: 'Error creating user',
     );
   }
-  print(createdId);
   final createdUser = await userRepository.getUser(createdId);
   if (createdUser == null) {
     return Response(

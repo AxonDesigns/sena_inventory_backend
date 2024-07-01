@@ -30,7 +30,6 @@ Future<Response> _onPost(RequestContext context) async {
       body: 'User already exists',
     );
   }
-  print(formData);
   formData['password'] = BCrypt.hashpw(formData['password'].toString(), BCrypt.gensalt());
   final success = await userRepository.createUser(UserDTO.fromJson(formData));
   if (!success) {

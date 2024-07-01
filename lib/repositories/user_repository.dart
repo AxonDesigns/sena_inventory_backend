@@ -116,7 +116,8 @@ class UserRepository extends Repository<User> {
       return null;
     }
 
-    final user = await getUserByEmail(jwt.payload['email'].toString());
+    final payload = jwt.payload as Map<String, dynamic>;
+    final user = await getUserByEmail(payload['email'].toString());
     return user;
   }
 
